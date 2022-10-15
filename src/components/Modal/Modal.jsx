@@ -1,43 +1,39 @@
 import styles from './Modal.module.css';
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-class Modal extends Component {
+const Modal = ({ src, alt, closeModal }) => {
+  const { overlay, modal } = styles;
 
-  handleOverlayClick = e => {
-    const overlay = e.currentTarget;
-    if (e.target === overlay) {
-      this.props.closeModal();
+  const handleOverlayClick = e => {
+    const modalOverlay = e.currentTarget;
+    if (e.target === modalOverlay) {
+      closeModal();
     }
   };
 
-  handleCloseOnEcsape = e => {
-    if (e.key === 'Escape') {
-      this.props.closeModal();
-    }
-  };
+  useEffect(() => {
+    const handleCloseOnEcsape = e => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    };
+    document.addEventListener('keydown', handleCloseOnEcsape);
 
-  componentDidMount() {
-    document.addEventListener('keydown', this.handleCloseOnEcsape);
-  }
+    return () => {
+      document.removeEventListener('keydown', handleCloseOnEcsape);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.handleCloseOnEcsape);
-  }
-
-  render() {
-    const { overlay, modal } = styles;
-    const { src, alt } = this.props;
-
-    return (
-      <div className={overlay} onClick={this.handleOverlayClick}>
-        <div className={modal}>
-          <img src={src} alt={alt} />
-        </div>
+  return (
+    <div className={overlay} onClick={handleOverlayClick}>
+      <div className={modal}>
+        <img src={src} alt={alt} />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 Modal.propTypes = {
   src: PropTypes.string.isRequired,
